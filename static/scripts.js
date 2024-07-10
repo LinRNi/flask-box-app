@@ -20,18 +20,39 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    function updateTable() {
+        const table = document.getElementById("boxTable");
+        // Clear existing rows
+        table.innerHTML = `
+            <tr>
+                <th>行</th>
+                <th>列</th>
+            </tr>
+        `;
+        // Add new rows for each box
+        boxes.forEach((box, index) => {
+            const row = table.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.innerHTML = Math.floor(box.y / box.size);
+            cell2.innerHTML = Math.floor(box.x / box.size);
+        });
+    }
+
     document.getElementById("addBox").addEventListener("click", function() {
         const size = 50;
-        const x = Math.random() * (canvas.width - size);
-        const y = Math.random() * (canvas.height - size);
+        const x = Math.floor(Math.random() * (canvas.width - size) / size) * size;
+        const y = Math.floor(Math.random() * (canvas.height - size) / size) * size;
         const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
         boxes.push({ x, y, size, color });
         drawInitialView();
+        updateTable();
     });
 
     document.getElementById("resetView").addEventListener("click", function() {
         boxes = [];
         drawInitialView();
+        updateTable();
     });
 
     document.getElementById("saveImage").addEventListener("click", function() {
