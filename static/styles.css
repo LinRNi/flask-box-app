@@ -14,13 +14,13 @@ body {
 
 .container {
     display: flex;
-    flex-direction: column;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     width: 90%;
     max-width: 1200px;
+    height: 90vh;
 }
 
 .left-panel {
@@ -28,7 +28,7 @@ body {
     flex-direction: column;
     padding: 20px;
     background-color: #d3e8f8;
-    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
     justify-content: flex-start;
     align-items: center;
 }
@@ -62,11 +62,12 @@ body {
 }
 
 .right-panel {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    min-height: 400px;
+    min-width: 600px;
 }
 
 #canvas-container {
@@ -74,21 +75,4 @@ body {
     height: 100%;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
-}
-
-@media (min-width: 768px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .left-panel {
-        border-right: 1px solid #ccc;
-        border-bottom: none;
-        height: 100%;
-    }
-
-    .right-panel {
-        flex: 1;
-        min-width: 400px;
-    }
 }
