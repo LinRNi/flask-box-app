@@ -3,25 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Grid</title>
-    <link rel="stylesheet" href="style.css">
+    <title>3D Cube Interaction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <div class="controls">
-            <button class="number-button" data-number="1">1</button>
-            <button class="number-button" data-number="2">2</button>
-            <button class="number-button" data-number="3">3</button>
-            <button class="number-button" data-number="4">4</button>
-            <button class="number-button" data-number="5">5</button>
-            <button class="number-button" data-number="6">6</button>
-            <button class="number-button" data-number="7">7</button>
-            <button class="number-button" data-number="8">8</button>
-            <button class="number-button" data-number="9">9</button>
+        <div class="left-panel">
+            <div class="number-grid">
+                <button class="number">1</button>
+                <button class="number">2</button>
+                <button class="number">3</button>
+                <button class="number">4</button>
+                <button class="number">5</button>
+                <button class="number">6</button>
+                <button class="number">7</button>
+                <button class="number">8</button>
+                <button class="number">9</button>
+            </div>
+            <button class="control">🗑️</button>
+            <button class="control">隨機變化</button>
+            <button class="control">方向標示</button>
+            <button class="control">方格標示</button>
+            <button class="control">方塊顏色</button>
+            <button class="control">還原視角</button>
+            <button class="control">另存圖檔</button>
         </div>
-        <div class="grid">
-            <div class="cell" data-cell="1"></div>
-            <div class="cell" data-cell="2"></div>
-            <div class="cell" data-cell="3"></div>
-            <div class="cell" data-cell="4"></div>
-            <div class="cell" data-cell="5"></div
+        <div class="right-panel">
+            <div id="canvas-container"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
