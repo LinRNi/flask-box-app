@@ -6,10 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    const gridHelper = new THREE.GridHelper(9, 3, 0x000000, 0x000000);
+    gridHelper.position.set(0, -1, 0);
+    scene.add(gridHelper);
+
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
 
     camera.position.z = 5;
 
@@ -24,10 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
     animate();
 
     const numbers = document.querySelectorAll('.number');
-    numbers.forEach((number) => {
+    numbers.forEach((number, index) => {
         number.addEventListener('click', () => {
-            const numberValue = number.innerText;
-            console.log(`Number ${numberValue} clicked`);
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+            const cube = new THREE.Mesh(geometry, material);
+            const position = getPositionByIndex(index + 1);
+            cube.position.set(position.x, position.y, position.z);
+            scene.add(cube);
         });
     });
 
@@ -40,4 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
+
+    function getPositionByIndex(index) {
+        const positions = [
+            { x: -1, y: 0, z: 1 },
+            { x: 0, y: 0, z: 1 },
+            { x: 1, y: 0, z: 1 },
+            { x: -1, y: 0, z: 0 },
+            { x: 0, y: 0, z: 0 },
+            { x: 1, y: 0, z: 0 },
+            { x: -1, y: 0, z: -1 },
+            { x: 0, y: 0, z: -1 },
+            { x: 1, y: 0, z: -1 }
+        ];
+        return positions[index - 1];
+    }
 });
