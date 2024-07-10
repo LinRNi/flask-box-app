@@ -11,9 +11,3 @@
 - `static/styles.css`：CSS 文件，定義頁面樣式。
 - `static/scripts.js`：JavaScript 文件，實現互動功能。
 
-## 安裝和運行
-
-1. 克隆儲存庫：
-   ```sh
-   git clone https://github.com/yourusername/flask-box-app.git
-   cd flask-box-app
