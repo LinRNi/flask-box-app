@@ -26,9 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const numbers = document.querySelectorAll('.number');
     numbers.forEach((number) => {
         number.addEventListener('click', () => {
-            // 根據按鈕點擊生成新的正方體或更新現有正方體的位置
             const numberValue = number.innerText;
-            // 假設每個按鈕對應特定位置，根據需要進行處理
             console.log(`Number ${numberValue} clicked`);
         });
     });
