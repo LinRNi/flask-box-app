@@ -6,12 +6,12 @@
 ## 文件結構
 
 flask-box-app/
-│
-├── app.py
-├── .gitignore
-├── README.md
-└── templates/
-└── index.html
+  │
+  ├── app.py
+  ├── .gitignore
+  ├── README.md
+  └── templates/
+  └── index.html
 
 
 
