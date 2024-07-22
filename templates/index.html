@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 互動網頁</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+        .button {
+            position: absolute;
+            top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #resetButton {
+            right: 20px;
+        }
+        #resetCameraButton {
+            right: 150px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .info-card, .stats-card {
+            position: absolute;
+            top: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        .info-card {
+            left: 20px;
+        }
+        .stats-card {
+            right: 20px;
+            top: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-card">
+        <h4>使用說明</h4>
+        <p>左鍵點擊：新增方塊</p>
+        <p>右鍵點擊：刪除方塊</p>        
+        <p>左鍵按住：旋轉視角</p>
+        <p>右鍵按住：拖動視角</p>
+        <p>滾輪滾動：縮放視角</p>
+    </div>
+    <div class="stats-card">
+        <h4>統計</h4>
+        <p>已生成方塊數量：<span id="cubeCount">0</span></p>
+        <p>層板數量：<span id="layerCount">0</span></p>
+        <p>門板數量：<span id="doorCount">0</span></p>
+        <p>柱子數量：<span id="columnCount">0</span></p>
+    </div>
+    <button id="resetButton" class="button">重設場景</button>
+    <button id="resetCameraButton" class="button">重設視角</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        let scene, camera, renderer, controls;
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let gridHelper;
+        const cubePositions = new Set();
+        const gridSize = 5;
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+
+            gridHelper = new THREE.GridHelper(10, 10, 0x888888, 0x888888);
+            scene.add(gridHelper);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(5, 5, 5);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = true;
+            controls.minDistance = 1;
+            controls.maxDistance = 500;
+            controls.maxPolarAngle = Math.PI / 2;
+
+            scene.add(new THREE.AmbientLight(0x404040));
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+            scene.add(new THREE.DirectionalLight(0xffffff, 0.5).position.set(1, 1, 1).normalize());
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('pointerdown', onMouseClick, false);
+
+            animate();
+        }
+
+        function resetCameraPosition() {
+            camera.position.set(5, 5, 5);
+            camera.lookAt(0, 0, 0);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        }
+
+        function addCube(position) {
+            const key = `${position.x},${position.y},${position.z}`;
+            if (!cubePositions.has(key)) {
+                const cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
+                cube.position.copy(position).floor().addScalar(0.5);
+                scene.add(cube);
+                cubePositions.add(key);
+                updateStats();
+            }
+        }
+
+        function removeCube(object) {
+            const key = `${object.position.x},${object.position.y},${object.position.z}`;
+            if (cubePositions.has(key)) {
+                scene.remove(object);
+                cubePositions.delete(key);
+                updateStats();
+            }
+        }
+
+        function resetScene() {
+            const objectsToRemove = scene.children.filter(obj => obj.type === 'Mesh');
+            objectsToRemove.forEach(obj => scene.remove(obj));
+            cubePositions.clear();
+            updateStats();
+            scene.add(new THREE.AmbientLight(0x404040));
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+            scene.add(new THREE.DirectionalLight(0xffffff, 0.5).position.set(1, 1, 1).normalize());
+            scene.add(new THREE.GridHelper(10, 10, 0x888888, 0x888888));
+        }
+
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
+                if (event.button === 0) {
+                    if (intersect.face && intersect.object.geometry instanceof THREE.BoxGeometry) {
+                        const worldNormal = intersect.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(intersect.object.matrixWorld)).normalize();
+                        addCube(intersect.object.position.clone().add(worldNormal).floor().addScalar(0.5));
+                    } else if (intersect.object instanceof THREE.GridHelper) {
+                        addCube(intersects[0].point.clone().floor().add(new THREE.Vector3(0.5, 0.5, 0.5)));
+                    }
+                } else if (event.button === 2 && intersect.object.geometry instanceof THREE.BoxGeometry) {
+                    removeCube(intersect.object);
+                }
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function updateStats() {
+            const cubeCount = cubePositions.size;
+            document.getElementById('cubeCount').innerText = cubeCount;
+
+            const cubeArray = Array.from(cubePositions).map(pos => pos.split(',').map(Number));
+            
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ blocks: cubeArray })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('layerCount').innerText = data.total_shelves;
+                document.getElementById('doorCount').innerText = data.total_doors;
+                document.getElementById('columnCount').innerText = data.total_columns;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById('resetButton').addEventListener('click', resetScene);
+        document.getElementById('resetCameraButton').addEventListener('click', resetCameraPosition);
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        init();
+    </script>
+</body>
+</html>
