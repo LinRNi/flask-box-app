@@ -41,15 +41,18 @@ flask-box-app/
 2. 創建虛擬環境並激活它
    ```bash
    python -m venv venv
-   source venv/bin/activate   # 對於Windows，運行 `venv\Scripts\activate````
+   source venv/bin/activate   # 對於Windows，運行 `venv\Scripts\activate`
+   ```
 3.安裝所需依賴
 ```bash
-  pip install flask```
+  pip install flask
+```
 
 運行應用
 在激活虛擬環境後，運行以下命令啟動Flask應用：
    ```bash
-python app.py```
+python app.py
+```
 
 
 
