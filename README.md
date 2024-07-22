@@ -39,20 +39,31 @@ flask-box-app/
 
 1. 安裝Python 3.x
 2. 創建虛擬環境並激活它
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # 對於Windows，運行 `venv\Scripts\activate`
-   ```
-3.安裝所需依賴
-```bash
-   pip install flask
-```
+    ```bash
+    python -m venv venv
+    source venv/bin/activate   # 對於Windows，運行 `venv\Scripts\activate`
+    ```
+3. 安裝所需依賴
+    ```bash
+    pip install flask
+    ```
 
-運行應用
+### 運行應用
+
 在激活虛擬環境後，運行以下命令啟動Flask應用：
-   ```bash
-   python app.py
-```
+    ```bash
+    python app.py
+    ```
+打開瀏覽器，訪問 `http://127.0.0.1:5000/` 以查看應用。
+
+## 功能特點
+
+- 左鍵點擊：新增方塊
+- 右鍵點擊：刪除方塊
+- 左鍵按住：旋轉視角
+- 右鍵按住：拖動視角
+- 滾輪滾動：縮放視角
+- 自動計算和更新所需的層板、門板和柱子數量
 
 
 
