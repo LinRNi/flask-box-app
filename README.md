@@ -42,7 +42,7 @@ flask-box-app/
 1. 安裝Python 3.x
 2. 創建虛擬環境並激活它
     ```bash
-    python -m venv venv
+    python -m venv venv        # For Linux or macOS
     source venv/bin/activate   # 對於Windows，運行 `venv\Scripts\activate`
     ```
 3. 安裝所需依賴
