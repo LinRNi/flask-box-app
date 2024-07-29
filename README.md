@@ -55,7 +55,7 @@ flask-box-app/
 在激活虛擬環境後，運行以下命令啟動Flask應用
 
    ```bash
-     python app.py
+   python app.py
    ```
 
 打開瀏覽器，訪問 `http://127.0.0.1:5000/` 以查看應用。
