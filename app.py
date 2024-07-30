@@ -11,14 +11,18 @@ def calculate_parts(blocks):
 
     for block in blocks:
         x, y, z = block
+        # 每個方塊初始需要的零件
         total_shelves += 2
         total_doors += 4
         total_columns += 4
 
+        # 檢查垂直堆疊，共享層板
         if (x, y + 1, z) in block_positions:
             total_shelves -= 1
         if (x, y - 1, z) in block_positions:
             total_shelves -= 1
+
+        # 檢查水平相鄰，共享門板和柱子
         if (x + 1, y, z) in block_positions:
             total_doors -= 1
             total_columns -= 2
