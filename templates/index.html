@@ -42,7 +42,7 @@
         }
         .stats-card {
             right: 20px;
-            top: 80px;
+            top: 80px; /* Move below the buttons */
         }
     </style>
 </head>
@@ -64,7 +64,9 @@
     </div>
     <button id="resetButton" class="button">重設場景</button>
     <button id="resetCameraButton" class="button">重設視角</button>
+    <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 引入 OrbitControls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
         let scene, camera, renderer, controls;
@@ -185,8 +187,9 @@
             const cubeCount = cubePositions.size;
             document.getElementById('cubeCount').innerText = cubeCount;
 
+            // 傳遞三維陣列到Python後端來計算層板、門板和柱子的數量
             const cubeArray = Array.from(cubePositions).map(pos => pos.split(',').map(Number));
-            
+            // 使用ajax或fetch API來傳遞數據到後端計算並更新統計信息
             fetch('/calculate', {
                 method: 'POST',
                 headers: {
