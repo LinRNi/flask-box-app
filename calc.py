@@ -19,6 +19,7 @@ class CalculatePart:
         self.total_shelves = 0
         self.total_doors = 0
         self.total_columns = 0
+        self.block_list = []
 
     def add_block(self, block:list):
         self.total_shelves += self._count_shelves(block)

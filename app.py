@@ -32,16 +32,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-"""
-
-每次跑for -> 1.判斷邏輯太難處理, 2. 耗時
-增加方塊時，先呼叫/block計算part數量，再呼叫/part取得數量
-
-1. 建議把數量放在外面，每次加方塊的時候傳當下新增方塊的的x,y,z 和cubeArray
-2. post/block -> 每次新增只計算當下要加多少part
-3. get/part -> 取得總計parts
-4. patch/rest_parts -> 再開一個api做歸零
-
-
-"""
 
