@@ -126,6 +126,26 @@
                 scene.add(cube);
                 cubePositions.add(key);
                 updateStats();
+
+                const new_block = {
+                    position: [position.x, position.y, position.z]
+                };
+
+                fetch('/block', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(new_block)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    updateStats();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
             }
         }
 
@@ -149,7 +169,26 @@
             scene.add(pointLight);
             scene.add(new THREE.DirectionalLight(0xffffff, 0.5).position.set(1, 1, 1).normalize());
             scene.add(new THREE.GridHelper(10, 10, 0x888888, 0x888888));
-        }
+
+            fetch('/reset_parts', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('layerCount').innerText = 0;
+                    document.getElementById('doorCount').innerText = 0;
+                    document.getElementById('columnCount').innerText = 0;
+                    updateStats();
+                } else {
+                    console.error('Failed to reset parts:', response.statusText);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        
+            }
 
         function onMouseClick(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -187,15 +226,12 @@
             const cubeCount = cubePositions.size;
             document.getElementById('cubeCount').innerText = cubeCount;
 
-            // 傳遞三維陣列到Python後端來計算層板、門板和柱子的數量
-            const cubeArray = Array.from(cubePositions).map(pos => pos.split(',').map(Number));
-            // 使用ajax或fetch API來傳遞數據到後端計算並更新統計信息
-            fetch('/calculate', {
-                method: 'POST',
+
+            fetch('/part', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ blocks: cubeArray })
+                }
             })
             .then(response => response.json())
             .then(data => {
