@@ -76,7 +76,7 @@
         const cubePositions = new Set();
         const gridSize = 5;
 
-        function init() {
+        async function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xf0f0f0);
 
@@ -109,6 +109,7 @@
             window.addEventListener('pointerdown', onMouseClick, false);
 
             animate();
+            await updateStats();
         }
 
         function resetCameraPosition() {
@@ -118,51 +119,48 @@
             controls.update();
         }
 
-        function addCube(position) {
+
+        async function addCube(position) {
             const key = `${position.x},${position.y},${position.z}`;
             if (!cubePositions.has(key)) {
                 const cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
                 cube.position.copy(position).floor().addScalar(0.5);
                 scene.add(cube);
                 cubePositions.add(key);
-                updateStats();
 
                 const new_block = {
                     position: [position.x, position.y, position.z]
                 };
-
-                fetch('/block', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(new_block)
-                })
-                .then(response => response.json())
-                .then(data => {
+                try {
+                    const response = await fetch('/block', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(new_block)
+                    });
+                    const data = await response.json();
                     console.log('Success:', data);
-                    updateStats();
-                })
-                .catch((error) => {
+                    await updateStats();
+                } catch (error) {
                     console.error('Error:', error);
-                });
+                }
             }
         }
 
-        function removeCube(object) {
+        async function removeCube(object) {
             const key = `${object.position.x},${object.position.y},${object.position.z}`;
             if (cubePositions.has(key)) {
                 scene.remove(object);
                 cubePositions.delete(key);
-                updateStats();
+                await updateStats();
             }
         }
 
-        function resetScene() {
+        async function resetScene() {
             const objectsToRemove = scene.children.filter(obj => obj.type === 'Mesh');
             objectsToRemove.forEach(obj => scene.remove(obj));
             cubePositions.clear();
-            updateStats();
             scene.add(new THREE.AmbientLight(0x404040));
             const pointLight = new THREE.PointLight(0xffffff, 1);
             pointLight.position.set(5, 5, 5);
@@ -181,16 +179,16 @@
                     document.getElementById('layerCount').innerText = 0;
                     document.getElementById('doorCount').innerText = 0;
                     document.getElementById('columnCount').innerText = 0;
-                    updateStats();
                 } else {
                     console.error('Failed to reset parts:', response.statusText);
                 }
             })
             .catch(error => console.error('Error:', error));
-        
+            await updateStats();
             }
 
-        function onMouseClick(event) {
+
+        async function onMouseClick(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -200,14 +198,15 @@
                 if (event.button === 0) {
                     if (intersect.face && intersect.object.geometry instanceof THREE.BoxGeometry) {
                         const worldNormal = intersect.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(intersect.object.matrixWorld)).normalize();
-                        addCube(intersect.object.position.clone().add(worldNormal).floor().addScalar(0.5));
+                        await addCube(intersect.object.position.clone().add(worldNormal).floor().addScalar(0.5));
                     } else if (intersect.object instanceof THREE.GridHelper) {
-                        addCube(intersects[0].point.clone().floor().add(new THREE.Vector3(0.5, 0.5, 0.5)));
+                        await addCube(intersects[0].point.clone().floor().add(new THREE.Vector3(0.5, 0.5, 0.5)));
                     }
                 } else if (event.button === 2 && intersect.object.geometry instanceof THREE.BoxGeometry) {
-                    removeCube(intersect.object);
+                    await removeCube(intersect.object);
                 }
             }
+            await updateStats();
         }
 
         function onWindowResize() {
@@ -222,24 +221,26 @@
             renderer.render(scene, camera);
         }
 
-        function updateStats() {
+
+        async function updateStats() {
             const cubeCount = cubePositions.size;
             document.getElementById('cubeCount').innerText = cubeCount;
 
-
-            fetch('/part', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('/part', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
                 document.getElementById('layerCount').innerText = data.total_shelves;
                 document.getElementById('doorCount').innerText = data.total_doors;
                 document.getElementById('columnCount').innerText = data.total_columns;
-            })
-            .catch(error => console.error('Error:', error));
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error').innerText = '無法更新統計數據，請稍後重試';
+            }
         }
 
         document.getElementById('resetButton').addEventListener('click', resetScene);
