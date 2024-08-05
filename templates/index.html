@@ -150,10 +150,26 @@
 
         async function removeCube(object) {
             const key = `${object.position.x},${object.position.y},${object.position.z}`;
+            const remove_block = {
+                position: [object.position.x, object.position.y, object.position.z]
+            };
             if (cubePositions.has(key)) {
                 scene.remove(object);
                 cubePositions.delete(key);
-                await updateStats();
+                try {
+                    const response = await fetch('/block', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(remove_block)
+                    });
+                    const data = await response.json();
+                    console.log('Success:', data);
+                    await updateStats();
+                } catch (error) {
+                    console.error('Error:', error);
+                }
             }
         }
 
