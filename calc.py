@@ -26,15 +26,22 @@ class CalculatePart:
         self.total_doors += self._count_door(block)
         self.total_columns += self._count_column(block)
         self.block_list.append(block)
-        return None
+
+    def remove_block(self, remove_block:list):
+        self.total_shelves -= self._count_shelves(remove_block)
+        self.total_doors -= self._count_door(remove_block)
+        self.total_columns -= self._count_column(remove_block)
+        self.block_list = [block for block in self.block_list if block != remove_block]
 
     def _count_shelves(self, block:list)-> int:
         x, z, y = block
-        if [x, z-1, y] in self.block_list:
-            return 1
-        else:
-            return 2
-        
+        check_list = [
+            [x, z-1, y],
+            [x, z+1, y]
+        ]
+        shelves = [block not in self.block_list for block in check_list]
+        return sum(shelves)
+
     def _count_door(self, block:list)-> int:
         x, z, y = block
         check_list = [
@@ -43,7 +50,7 @@ class CalculatePart:
             [x-1, z, y],
             [x, z, y-1]
         ]
-        door = [int(target not in self.block_list) for target in check_list]
+        door = [target not in self.block_list for target in check_list]
         return sum(door)
     
     def _count_column(self, block:list)-> int:
@@ -54,7 +61,6 @@ class CalculatePart:
             [[x-1, z, y], [x-1, z, y-1], [x, z, y-1]],
             [[x+1, z, y], [x+1, z, y-1], [x, z, y-1]]
         ]
-
-        result = [all([loc not in self.block_list for loc in locs]) for locs in check_list]
-        return sum(result)
+        columns = [all([loc not in self.block_list for loc in locs]) for locs in check_list]
+        return sum(columns)
 

@@ -13,8 +13,6 @@ def index():
 def add_block():
     data = request.get_json()
     block = data.get('position')
-    print(block)
-
     Calc.add_block(block)
     return "Block added successfully", 200
 
@@ -27,6 +25,13 @@ def get_parts():
 def reset_part():
     Calc.reset_parts()
     return "Reset successfully", 200
+
+@app.route('/block', methods=['DELETE'])
+def remove_block():
+    data = request.get_json()
+    block = data.get('position')
+    Calc.remove_block(block)
+    return "Block deleted successfully", 200
 
 if __name__ == '__main__':
     app.run(debug=True)
